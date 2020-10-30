@@ -28,7 +28,7 @@ h3 {
 
 body {
   font-family: 'Courier New', Courier, monospace;  
-  background-image: url(home-build.jpg);
+  background-image: url("home-build.jpg");
   background-color: rgb(43, 36, 36);
 }
 
