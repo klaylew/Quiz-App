@@ -26,9 +26,9 @@ function buildStartScreen() {
     
     <form>
       <h3>Welcome to your quiz on Modern Construction Basics!</h3>
-      <p>This quiz will test your knowledge of basic Construction Methods.</p>
-      <p>Click the button below to get started.</p>
-      <p>Each question is worth 10 Points.</p>
+      <p>This simple quiz will test your knowledge of a few basic Construction Methods.</p>
+      <p>There are 5 questions worth 10 points each.</p>
+      <p>Click the button below to get started! Good luck!</p>
       <button type="button" id="startQuiz">Begin Quiz</button>
     </form>
   </div>
@@ -38,12 +38,12 @@ function buildStartScreen() {
 // track score and current question
 function scoreAndQuestionTracker(){
   return` 
-  <ul class="trackScoreAndQuestion">
+  <ul class="trackScoreAndQuestion" style="list-style-type:none;">
     <li id="score">
-      Your current score is ${STORE.score * 10} out of ${STORE.questions.length * 10}
+      Current score: ${STORE.score * 10} of ${STORE.questions.length * 10}
     </li>
     <li id="question">
-      You are on question ${STORE.questionNumber + 1} out of ${STORE.questions.length}
+      Question ${STORE.questionNumber + 1} of ${STORE.questions.length}
     </li>
   </ul>
   `
@@ -117,8 +117,9 @@ function buildResultsScreen(){
   return `
   <div class="results">
   <form id="restart-quiz">
-      <legend>Your Score is: ${STORE.score*10}</legend>
+      <legend>Your Score: ${STORE.score*10}/50</legend>
       <br>
+      <p>Click below to start over.</p>
       <br>
       <button type="button" id="restartBtn"> Restart Quiz </button>
   </form>
