@@ -51,7 +51,7 @@ function scoreAndQuestionTracker(){
 
 //display current question
 function displayQuestion(){
-  let currentQuestion = STORE.questions[STORE.currentQuestion];
+  let currentQuestion = STORE.questions[STORE.questionNumber];
   return `
     <form id="question-form" class="question-form">
       <fieldset>
@@ -59,12 +59,16 @@ function displayQuestion(){
           <legend> ${currentQuestion.question}</legend>
         </div>
         <div class="options">
+        <br>
+        <br>
           <div class="answers">
             ${buildAnswerList()}
           </div>
+          <br>
+          <br>
         </div>
         <button type="submit" id="submit" >Submit</button>
-        <button type="button" id="next" > Next </button>
+        <button type="button" id="next" > Next >></button>
       </fieldset>
     </form >
   `;
@@ -88,17 +92,38 @@ function buildAnswerList(){
   return answerlistHtml;
 }
 
-
   
 
 // build feedback for submitted answer on each question
-function answerFeedback(){
-
+function answerFeedback(answerValidity){
+    let correctAnswer = STORE.questions[STORE.questionNumber].correctAnswer;
+    let html = '';
+    if (answerValidity === 'correct') {
+        html = `
+      <div class="right-answer">That is correct!</div>
+      `;
+    }
+    else if (answerValidity === 'incorrect') {
+        html = `
+        <div class="wrong-answer">That is incorrect. The correct answer is ${correctAnswer}.</div>
+      `;
+    }
+    
+    return html;
 };
 
 // build screen to display results from quiz
 function buildResultsScreen(){
-
+  return `
+  <div class="results">
+  <form id="restart-quiz">
+      <legend>Your Score is: ${STORE.score*10}</legend>
+      <br>
+      <br>
+      <button type="button" id="restartBtn"> Restart Quiz </button>
+  </form>
+  </div
+`
 };
 
 
@@ -115,11 +140,14 @@ function render() {
     $('main').html(buildStartScreen());
     return;
   }
-  else if (STORE.quizStarted === true){
+  else if (STORE.questionNumber >= 0 && STORE.questionNumber < STORE.questions.length){
     console.log("quizStarted changed to true");
     html = scoreAndQuestionTracker();
-    html += buildAnswerList();
+    html += displayQuestion();
     $('main').html(html);
+  }
+  else {
+    $('main').html(buildResultsScreen());
   }
 }
 
@@ -138,13 +166,61 @@ function startQuizClick(){
 }
 
 // submission of answer on every question
-function submitAnswer(){};
+function submitAnswer(){
+  $('body').on('submit', '#question-form', function(event){
+    event.preventDefault();
+    console.log("submit answer ran")
+    const question = STORE.questions[STORE.questionNumber];
+   
+    //identify selected answer from radio list
+    let selection = $('input[name=list]:checked').val();
+
+    //
+    let optionId = `#option-${question.answers.findIndex(i => i === selection)}`;
+
+    if (selection === question.correctAnswer) {
+      STORE.score ++;
+      $(optionId).append(answerFeedback('correct'));
+    }
+    else {
+      $(optionId).append(answerFeedback('incorrect'));
+    }
+
+    STORE.questionNumber++;
+     // hide the submit button
+     $('#submit').hide();
+     // disable all inputs
+     $('input[type=radio]').each(() => {
+         $('input[type=radio]').attr('disabled', true);
+     });
+     // show the next button
+     $('#next').show();
+
+    });
+     
+}
 
 // move to next question on button click
-function nextQuestion(){};
+function nextQuestion(){
+  $('body').on('click', '#next', (event) => {
+    render();
+    });
+}
 
 // restart of quiz on button click on results screen
-function restartQuiz(){};
+function restartQuiz(){
+    STORE.quizStarted = false;
+    STORE.questionNumber = 0;
+    STORE.score = 0;
+};
+
+function restartButton() {
+  console.log("clicked on restart button");
+  $('main').on('click', '#restartBtn', () => {
+    restartQuiz();
+    render();
+  });
+}
 
 function handleQuiz() {
   // console.log("handleQuiz ran");
@@ -152,7 +228,7 @@ function handleQuiz() {
   startQuizClick();
   submitAnswer();
   nextQuestion();
-  restartQuiz();
+  restartButton();
 }
 
 $(handleQuiz);
